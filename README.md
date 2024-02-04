@@ -4,13 +4,13 @@
 
 ## System dependencies
 
-- `libheif-dev` >= 1.17.0
+- `libheif-dev` >= 1.17.0 (any version if `use-bindgen` feature is enabled)
 - `clang` - to generate rust bindings for `libheif`.
   [See bindgen requirements.](https://rust-lang.github.io/rust-bindgen/requirements.html)
 
 `clang` wouldn't be needed if you disable `use-bindgen` feature.
 In this case the pre-generated file `bindings.rs` will be used
-instead of generating it on the fly with help of `binden` crate.
+instead of generating it on the fly with help of `bindgen` crate.
 
 Warning: `bindings.rs` file was generated under x64 linux and may
 not work as expected under x32 architectures or other operating systems.

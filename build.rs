@@ -12,8 +12,6 @@ fn main() {
         return;
     }
 
-    #[allow(unused_mut)]
-    #[allow(unused_variables)]
     let mut include_dirs: Vec<String> = Vec::new();
 
     ConanInstall::new().build("missing").run().parse().emit();
@@ -26,7 +24,7 @@ fn main() {
 
     let include_path = build_paths.first().unwrap().path().parent().unwrap();
 
-    include_dirs.push(format!("--include-directory={}", include_path.to_str().unwrap()));
+    include_dirs.push(include_path.to_str().unwrap().to_string());
 
     #[cfg(feature = "use-bindgen")]
     {
@@ -51,7 +49,7 @@ fn main() {
             ]);
         if !include_dirs.is_empty() {
             dbg!(&include_dirs);
-            builder = builder.clang_args(include_dirs);
+            builder = builder.clang_args(include_dirs.iter().map(|dir| format!("--include-directory={}", dir)));
         }
 
         // Finish the builder and generate the bindings.

@@ -1,8 +1,8 @@
 # Change Log
 
-## [Unreleased] - ReleaseDate
+## [2.1.0] - 2023-11-28
 
-- Updated "bindings.rs" to correspond `libheif 1.17.1`:
+- Updated "bindings.rs" to correspond `libheif 1.17.4`:
   - added new values into `heif_compression_format` "enum':
     - `heif_compression_format_heif_compression_mask`
   - added new values into `heif_brand` "enum':
@@ -14,6 +14,11 @@
     - `heif_image_handle_get_preferred_decoding_colorspace`
     - `heif_image_handle_get_context`
     - `heif_image_handle_get_metadata_item_uri_type`
+
+## [2.0.1] - 2023-11-24
+
+- Changed `build.rs` to fix missing include-directory on macOS 
+  ([#6](https://github.com/Cykooz/libheif-sys/pull/6)).
 
 ## [2.0.0] - 2023-09-12
 
