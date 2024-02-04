@@ -26,8 +26,9 @@ use-bindgen = ["dep:bindgen"]
 
 [build-dependencies]
 bindgen = { version = "0.68", optional = true }
-pkg-config = "0.3"
-
+conan2 = "0.1"
+home = "0.5"
+walkdir = "2"
 
 [target.'cfg(windows)'.build-dependencies]
 vcpkg = "0.2"

@@ -1,3 +1,10 @@
+extern crate conan2;
+extern crate home;
+extern crate walkdir;
+
+use conan2::ConanInstall;
+use walkdir::WalkDir;
+
 fn main() {
     if std::env::var("DOCS_RS").is_ok() {
         // Don't link with libheif in case of building documentation for docs.rs.
@@ -5,46 +12,21 @@ fn main() {
         return;
     }
 
-    // Tell cargo to tell rustc to link the system heif
-    // shared library.
     #[allow(unused_mut)]
     #[allow(unused_variables)]
     let mut include_dirs: Vec<String> = Vec::new();
 
-    #[cfg(not(target_os = "windows"))]
-    if let Err(err) = pkg_config::Config::new()
-        .atleast_version("1.16")
-        .probe("libheif")
-    {
-        println!("cargo:warning={}", err);
-        std::process::exit(1);
-    }
+    ConanInstall::new().build("missing").run().parse().emit();
 
-    #[cfg(target_os = "windows")]
-    {
-        let vcpkg_lib = vcpkg::Config::new()
-            .emit_includes(true)
-            .find_package("libheif");
-        match vcpkg_lib {
-            Ok(lib) => {
-                // https://users.rust-lang.org/t/bindgen-cant-find-included-file/62687
-                use walkdir::WalkDir;
-                for path in lib.include_paths {
-                    for subdir in WalkDir::new(path)
-                        .into_iter()
-                        .filter_entry(|e| e.file_type().is_dir())
-                    {
-                        let dir = subdir.unwrap().path().to_string_lossy().to_string();
-                        include_dirs.push(format!("--include-directory={}", dir));
-                    }
-                }
-            }
-            Err(err) => {
-                println!("cargo:warning={}", err);
-                std::process::exit(1);
-            }
-        }
-    }
+    let conan_dir = home::home_dir().unwrap().join(".conan2");
+    let build_paths = WalkDir::new(conan_dir.to_str().unwrap()).max_depth(10).into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|p| p.path().to_str().unwrap().ends_with("include/libheif"))
+        .collect::<Vec<_>>();
+
+    let include_path = build_paths.first().unwrap().path().parent().unwrap();
+
+    include_dirs.push(format!("--include-directory={}", include_path.to_str().unwrap()));
 
     #[cfg(feature = "use-bindgen")]
     {
