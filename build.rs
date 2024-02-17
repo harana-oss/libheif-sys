@@ -3,6 +3,7 @@ extern crate home;
 extern crate walkdir;
 
 use conan2::ConanInstall;
+use std::path::PathBuf;
 use walkdir::WalkDir;
 
 fn main() {
@@ -16,7 +17,10 @@ fn main() {
 
     ConanInstall::new().build("missing").run().parse().emit();
 
-    let conan_dir = home::home_dir().unwrap().join(".conan2");
+    let conan_dir = match std::env::var("CONAN_HOME").ok() {
+      None                    => home::home_dir().unwrap().join(".conan2"),
+      Some(dir)       => PathBuf::from(dir)
+    };
     let build_paths = WalkDir::new(conan_dir.to_str().unwrap()).max_depth(10).into_iter()
         .filter_map(|e| e.ok())
         .filter(|p| p.path().to_str().unwrap().ends_with("include/libheif"))
